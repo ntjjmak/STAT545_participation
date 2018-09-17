@@ -10,6 +10,8 @@ CM002 = classroom 2
 
 etc.
 
-This is modified in GitHub and RStudio.
+
+**This is modified in both GitHub and RStudio.**
+
 
 *Nicole Mak*
