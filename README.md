@@ -1,6 +1,13 @@
-# Welcome welcome!
+# Welcome! :smiley:
 
-Repository for exploring version control and markdown.
-This is a repository for a STAT545 class exercise.
+## Repository for class participation in STAT 545.
 
--Nicole Mak
+**Please note: Participation is organized in folders.**
+
+CM001 = classroom 1
+
+CM002 = classroom 2
+
+etc.
+
+*Nicole Mak*
