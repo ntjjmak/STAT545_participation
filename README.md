@@ -15,3 +15,6 @@ etc.
 
 
 *Nicole Mak*
+
+
+[View Page Version Here](https://ntjjmak.github.io/STAT545_participation/)
