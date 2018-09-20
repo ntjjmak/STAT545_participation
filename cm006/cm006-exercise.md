@@ -70,7 +70,26 @@ Notice the “metaprogramming” again\!
       - Note: `ggplot2` does some data wrangling and computations
         itself\! We don’t always have to modify the data frame.
 
+<!-- end list -->
+
+``` r
+ggplot(gapminder, aes(x=lifeExp, y=log(gdpPercap))) +
+         geom_point()
+```
+
+![](cm006-exercise_files/figure-gfm/unnamed-chunk-4-1.png)<!-- -->
+
 6.  Try again, this time by changing the *scale* (this way is better).
+
+<!-- end list -->
+
+``` r
+ggplot(gapminder, aes(lifeExp, gdpPercap)) +
+  geom_point() +
+  scale_y_log10()
+```
+
+![](cm006-exercise_files/figure-gfm/unnamed-chunk-5-1.png)<!-- -->
 
 7.  The aesthetic mappings can be specified on the geom layer if you
     want, instead of the main `ggplot` call. Give it a try:
@@ -92,16 +111,45 @@ Let’s build a histogram of life expectancy.
 | Grammar Component     | Specification |
 | --------------------- | ------------- |
 | **data**              | `gapminder`   |
-| **aesthetic mapping** |               |
-| **geometric object**  |               |
-| scale                 |               |
-| statistical transform |               |
+| **aesthetic mapping** | `x`           |
+| **geometric object**  | histogram     |
+| scale                 | linear        |
+| statistical transform | none          |
 
 2.  Build the histogram of life expectancy.
 
+<!-- end list -->
+
+``` r
+ggplot(gapminder, aes(lifeExp)) +
+  geom_histogram()
+```
+
+    ## `stat_bin()` using `bins = 30`. Pick better value with `binwidth`.
+
+![](cm006-exercise_files/figure-gfm/unnamed-chunk-6-1.png)<!-- -->
+
 3.  Change the number of bins to 50.
 
+<!-- end list -->
+
+``` r
+ggplot(gapminder, aes(lifeExp)) +
+  geom_histogram(bins=100)
+```
+
+![](cm006-exercise_files/figure-gfm/unnamed-chunk-7-1.png)<!-- -->
+
 4.  Instead of a histogram, let’s create a kernel density plot.
+
+<!-- end list -->
+
+``` r
+ggplot(gapminder, aes(lifeExp)) +
+  geom_density(fill="green")
+```
+
+![](cm006-exercise_files/figure-gfm/unnamed-chunk-8-1.png)<!-- -->
 
 5.  Optional: git stage and commit
 
@@ -116,24 +164,40 @@ much better on a log scale\!
 1.  Fill out the grammar components below. Again, bold *must* be
     specified to make a `ggplot2` plot.
 
-| Grammar Component     | Specification |
-| --------------------- | ------------- |
-| **data**              | `gapminder`   |
-| **aesthetic mapping** |               |
-| **geometric object**  |               |
-| scale                 |               |
-| statistical transform |               |
+| Grammar Component     | Specification    |
+| --------------------- | ---------------- |
+| **data**              | `gapminder`      |
+| **aesthetic mapping** | `x` and `y`      |
+| **geometric object**  | boxplot          |
+| scale                 | log-y            |
+| statistical transform | 5-number summary |
 
 2.  Initiate the `ggplot` call, with the log y scale, and store it in
     the variable `a`. Print out `a`.
 
+<!-- end list -->
+
+``` r
+a <- ggplot(gapminder, aes(continent, pop)) +
+    scale_y_log10()
+a
+```
+
+![](cm006-exercise_files/figure-gfm/unnamed-chunk-9-1.png)<!-- -->
+
 3.  Add the boxplot geom to `a`.
+
+<!-- end list -->
+
+``` r
+a +geom_boxplot()
+```
+
+![](cm006-exercise_files/figure-gfm/unnamed-chunk-10-1.png)<!-- -->
 
 4.  A violin plot is a kernel density on its side, made symmetric. Add
     that geom to `a`.
-    
       - What’s better here, boxplots or violin plots? Why?
-
 5.  Optional: git stage and commit
 
 **Use of boxplot**: Visualize 1-dimensional distributions (of a single
