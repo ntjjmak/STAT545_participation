@@ -71,14 +71,73 @@ This link will show you what the integers map to.
 Make a scatterplot. Then:
 
   - Try colour as categorical variable.
+
+<!-- end list -->
+
+``` r
+gvsl + geom_point(aes(colour = continent))
+```
+
+![](cm007-exercise_files/figure-gfm/unnamed-chunk-4-1.png)<!-- -->
+
   - Try `colour` and `color`.
+
+<!-- end list -->
+
+``` r
+gvsl + geom_point(aes(color = continent))
+```
+
+![](cm007-exercise_files/figure-gfm/unnamed-chunk-5-1.png)<!-- -->
+
   - Try colour as numeric variable.
       - Try `trans="log10"` for log scale.
 
+<!-- end list -->
+
+``` r
+gvsl + geom_point(aes(colour = pop))
+```
+
+![](cm007-exercise_files/figure-gfm/unnamed-chunk-6-1.png)<!-- -->
+
+``` r
+gvsl + geom_point(aes(colour = pop)) +
+  scale_colour_continuous(trans = "log10")
+```
+
+![](cm007-exercise_files/figure-gfm/unnamed-chunk-6-2.png)<!-- -->
+
 Make a line plot of `gdpPercap` over time for all countries. Colour by
-`lifeExp > 60` (remember that `lifeExp` looks bimodal?)
+`lifeExp > 60` (remember that `lifeExp` looks bimodal?) Notice ggplot
+does data wrangling within ggplot. You can transform your data within an
+aesthetic.
+
+``` r
+gvsl + geom_point(aes(colour = lifeExp > 60))
+```
+
+![](cm007-exercise_files/figure-gfm/unnamed-chunk-7-1.png)<!-- -->
 
 Try adding colour to a histogram. How is this different?
+
+``` r
+ggplot(gapminder, aes(lifeExp)) +
+  geom_histogram(aes(colour = continent))
+```
+
+    ## `stat_bin()` using `bins = 30`. Pick better value with `binwidth`.
+
+![](cm007-exercise_files/figure-gfm/unnamed-chunk-8-1.png)<!-- -->
+
+``` r
+ggplot(gapminder, aes(lifeExp)) +
+  geom_histogram(aes(fill = continent))
+```
+
+    ## `stat_bin()` using `bins = 30`. Pick better value with `binwidth`.
+
+![](cm007-exercise_files/figure-gfm/unnamed-chunk-8-2.png)<!-- -->
 
 ## Facetting
 
