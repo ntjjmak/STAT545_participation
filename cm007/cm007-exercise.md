@@ -141,17 +141,73 @@ ggplot(gapminder, aes(lifeExp)) +
 
 ## Facetting
 
+Basically, this is an aesthetic which puts plots side-by-side for
+comparison
+
 Make histograms of `gdpPercap` for each continent. Try the `scales` and
 `ncol` arguments.
 
+``` r
+ggplot(gapminder, aes(lifeExp)) +
+  geom_histogram() +
+  facet_wrap( ~ continent)
+```
+
+    ## `stat_bin()` using `bins = 30`. Pick better value with `binwidth`.
+
+![](cm007-exercise_files/figure-gfm/unnamed-chunk-9-1.png)<!-- -->
+
+Note, they all share the same x-axis.
+
+``` r
+ggplot(gapminder, aes(lifeExp)) +
+  geom_histogram() +
+  facet_wrap( ~ continent, scales = "free_x")
+```
+
+    ## `stat_bin()` using `bins = 30`. Pick better value with `binwidth`.
+
+![](cm007-exercise_files/figure-gfm/unnamed-chunk-10-1.png)<!-- -->
+
 Remove Oceania. Add another variable: `lifeExp > 60`.
+
+``` r
+ggplot(gapminder, aes(gdpPercap)) +
+  facet_grid(continent ~ lifeExp > 60)+
+  geom_histogram()
+```
+
+    ## `stat_bin()` using `bins = 30`. Pick better value with `binwidth`.
+
+![](cm007-exercise_files/figure-gfm/unnamed-chunk-11-1.png)<!-- -->
 
 ## Bubble Plots
 
   - Add a `size` aesthetic to a scatterplot. What about `cex`?
+
+<!-- end list -->
+
+``` r
+gvsl + geom_point(aes(size = pop), alpha = 0.5) +
+  scale_size_area()
+```
+
+![](cm007-exercise_files/figure-gfm/unnamed-chunk-12-1.png)<!-- -->
+
   - Try adding `scale_radius()` and `scale_size_area()`. What’s better?
+    `scale_size_area` makes the size proportional to the true value.
+
   - Use `shape=21` to distinguish between `fill` (interior) and `colour`
     (exterior).
+
+<!-- end list -->
+
+``` r
+gvsl + geom_point(aes(size = pop, fill = continent),  shape = 21) + 
+  facet_grid( ~ continent)
+```
+
+![](cm007-exercise_files/figure-gfm/unnamed-chunk-13-1.png)<!-- -->
 
 ## “Complete” plot
 
@@ -160,6 +216,16 @@ Let’s try plotting much of the data.
   - gdpPercap vs lifeExp with pop bubbles
   - facet by year
   - colour by continent
+
+<!-- end list -->
+
+``` r
+gvsl + geom_point(aes(size = pop, colour = continent)) +
+  scale_size_area() +
+  facet_wrap(~ year)
+```
+
+![](cm007-exercise_files/figure-gfm/unnamed-chunk-14-1.png)<!-- -->
 
 # Continue from last time (geom exploration with `x` and `y` aesthetics)
 

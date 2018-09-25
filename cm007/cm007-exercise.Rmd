@@ -82,16 +82,48 @@ ggplot(gapminder, aes(lifeExp)) +
 
 
 ## Facetting
+Basically, this is an aesthetic which puts plots side-by-side for comparison
 
 Make histograms of `gdpPercap` for each continent. Try the `scales` and `ncol` arguments. 
+```{r}
+ggplot(gapminder, aes(lifeExp)) +
+  geom_histogram() +
+  facet_wrap( ~ continent)
+```
+
+Note, they all share the same x-axis.
+
+```{r}
+ggplot(gapminder, aes(lifeExp)) +
+  geom_histogram() +
+  facet_wrap( ~ continent, scales = "free_x")
+```
 
 Remove Oceania. Add another variable: `lifeExp > 60`. 
+```{r}
+ggplot(gapminder, aes(gdpPercap)) +
+  facet_grid(continent ~ lifeExp > 60)+
+  geom_histogram()
+```
 
 ## Bubble Plots
 
 - Add a `size` aesthetic to a scatterplot. What about `cex`?
+
+```{r}
+gvsl + geom_point(aes(size = pop), alpha = 0.5) +
+  scale_size_area()
+```
+
 - Try adding `scale_radius()` and `scale_size_area()`. What's better?
+`scale_size_area` makes the size proportional to the true value.
+
 - Use `shape=21` to distinguish between `fill` (interior) and `colour` (exterior).
+
+```{r}
+gvsl + geom_point(aes(size = pop, fill = continent),  shape = 21) + 
+  facet_grid( ~ continent)
+```
 
 ## "Complete" plot
 
@@ -101,6 +133,11 @@ Let's try plotting much of the data.
 - facet by year
 - colour by continent
 
+```{r}
+gvsl + geom_point(aes(size = pop, colour = continent)) +
+  scale_size_area() +
+  facet_wrap(~ year)
+```
 
 
 # Continue from last time (geom exploration with `x` and `y` aesthetics)
