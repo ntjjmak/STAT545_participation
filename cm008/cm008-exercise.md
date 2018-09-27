@@ -219,13 +219,68 @@ pop)? Can I? Would this even make sense?
 For each continent: What is the smallest country-wide median GDP per
 capita?
 
+``` r
+gapminder %>% 
+  group_by(continent, country) %>% 
+  summarise(md = median(gdpPercap)) %>% 
+  summarise(min = min(md))
+```
+
+    ## # A tibble: 5 x 2
+    ##   continent    min
+    ##   <fct>      <dbl>
+    ## 1 Africa      455.
+    ## 2 Americas   1691.
+    ## 3 Asia        378 
+    ## 4 Europe     3194.
+    ## 5 Oceania   16933.
+
 Note that ggplot2’s grouping is different from dplyr’s\! Try making a
 spaghetti plot of lifeExp over time for each coutry, by piping in a
 grouped data frame – it won’t work:
 
+``` r
+gapminder %>% 
+  group_by(country) %>% 
+  ggplot(aes(year, lifeExp)) +
+  geom_line()
+```
+
+![](cm008-exercise_files/figure-gfm/unnamed-chunk-9-1.png)<!-- -->
+
+``` r
+gapminder %>% 
+  ggplot(aes(year, lifeExp, group_by == continent)) +
+  geom_line()
+```
+
+![](cm008-exercise_files/figure-gfm/unnamed-chunk-9-2.png)<!-- -->
+
 Your turn\! For each continent, what is the median GDP per capita of
 countries with high (\>60) life expectancy vs countries with low
 (\<=60)? Sort this data frame by median GDP per capita.
+
+``` r
+library(gapminder)
+gapminder%>% 
+  group_by(continent, lifeExp > 60) %>% 
+  summarise(median = median(gdpPercap)) %>% 
+  arrange(median)
+```
+
+    ## # A tibble: 9 x 3
+    ## # Groups:   continent [5]
+    ##   continent `lifeExp > 60` median
+    ##   <fct>     <lgl>           <dbl>
+    ## 1 Asia      FALSE           1031.
+    ## 2 Africa    FALSE           1071.
+    ## 3 Europe    FALSE           2384.
+    ## 4 Americas  FALSE           3080.
+    ## 5 Africa    TRUE            4442.
+    ## 6 Asia      TRUE            5250.
+    ## 7 Americas  TRUE            6678.
+    ## 8 Europe    TRUE           12672.
+    ## 9 Oceania   TRUE           17983.
 
 There are special functions to summarize by. Let’s see some of them:
 
@@ -238,6 +293,50 @@ Convenience functions:
   - `count(...)` (= `group_by(...) %>% tally()`)
 
 n\_distinct: How many years of record does each country have?
+
+``` r
+gapminder %>% 
+  group_by(continent) %>% 
+  summarize(num = n())
+```
+
+    ## # A tibble: 5 x 2
+    ##   continent   num
+    ##   <fct>     <int>
+    ## 1 Africa      624
+    ## 2 Americas    300
+    ## 3 Asia        396
+    ## 4 Europe      360
+    ## 5 Oceania      24
+
+``` r
+gapminder %>% 
+  group_by(continent) %>% 
+  tally()
+```
+
+    ## # A tibble: 5 x 2
+    ##   continent     n
+    ##   <fct>     <int>
+    ## 1 Africa      624
+    ## 2 Americas    300
+    ## 3 Asia        396
+    ## 4 Europe      360
+    ## 5 Oceania      24
+
+``` r
+gapminder %>% 
+  count(continent)
+```
+
+    ## # A tibble: 5 x 2
+    ##   continent     n
+    ##   <fct>     <int>
+    ## 1 Africa      624
+    ## 2 Americas    300
+    ## 3 Asia        396
+    ## 4 Europe      360
+    ## 5 Oceania      24
 
 count
 
@@ -261,9 +360,80 @@ a topic for STAT 547.
 Calculate the growth in population since the first year on record *for
 each country*. `first()` is useful.
 
+``` r
+gapminder %>% 
+  group_by(country) %>% 
+  mutate(growth = pop - first(pop)) #creates a new variable
+```
+
+    ## # A tibble: 1,704 x 7
+    ## # Groups:   country [142]
+    ##    country     continent  year lifeExp      pop gdpPercap   growth
+    ##    <fct>       <fct>     <int>   <dbl>    <int>     <dbl>    <int>
+    ##  1 Afghanistan Asia       1952    28.8  8425333      779.        0
+    ##  2 Afghanistan Asia       1957    30.3  9240934      821.   815601
+    ##  3 Afghanistan Asia       1962    32.0 10267083      853.  1841750
+    ##  4 Afghanistan Asia       1967    34.0 11537966      836.  3112633
+    ##  5 Afghanistan Asia       1972    36.1 13079460      740.  4654127
+    ##  6 Afghanistan Asia       1977    38.4 14880372      786.  6455039
+    ##  7 Afghanistan Asia       1982    39.9 12881816      978.  4456483
+    ##  8 Afghanistan Asia       1987    40.8 13867957      852.  5442624
+    ##  9 Afghanistan Asia       1992    41.7 16317921      649.  7892588
+    ## 10 Afghanistan Asia       1997    41.8 22227415      635. 13802082
+    ## # ... with 1,694 more rows
+
+``` r
+gapminder %>% 
+  group_by(country) %>% 
+  mutate(change = pop - lag(pop)) #creates a new variable, lag function shifts the whole vector back once so you can predict)
+```
+
+    ## # A tibble: 1,704 x 7
+    ## # Groups:   country [142]
+    ##    country     continent  year lifeExp      pop gdpPercap   change
+    ##    <fct>       <fct>     <int>   <dbl>    <int>     <dbl>    <int>
+    ##  1 Afghanistan Asia       1952    28.8  8425333      779.       NA
+    ##  2 Afghanistan Asia       1957    30.3  9240934      821.   815601
+    ##  3 Afghanistan Asia       1962    32.0 10267083      853.  1026149
+    ##  4 Afghanistan Asia       1967    34.0 11537966      836.  1270883
+    ##  5 Afghanistan Asia       1972    36.1 13079460      740.  1541494
+    ##  6 Afghanistan Asia       1977    38.4 14880372      786.  1800912
+    ##  7 Afghanistan Asia       1982    39.9 12881816      978. -1998556
+    ##  8 Afghanistan Asia       1987    40.8 13867957      852.   986141
+    ##  9 Afghanistan Asia       1992    41.7 16317921      649.  2449964
+    ## 10 Afghanistan Asia       1997    41.8 22227415      635.  5909494
+    ## # ... with 1,694 more rows
+
 Notice that `dplyr` has retained the original grouping.
 
 How about growth compared to `1972`?
+
+``` r
+gapminder %>% 
+  group_by(country) %>% 
+  mutate(growth = pop - pop[year ==1972])
+```
+
+    ## # A tibble: 1,704 x 7
+    ## # Groups:   country [142]
+    ##    country     continent  year lifeExp      pop gdpPercap   growth
+    ##    <fct>       <fct>     <int>   <dbl>    <int>     <dbl>    <int>
+    ##  1 Afghanistan Asia       1952    28.8  8425333      779. -4654127
+    ##  2 Afghanistan Asia       1957    30.3  9240934      821. -3838526
+    ##  3 Afghanistan Asia       1962    32.0 10267083      853. -2812377
+    ##  4 Afghanistan Asia       1967    34.0 11537966      836. -1541494
+    ##  5 Afghanistan Asia       1972    36.1 13079460      740.        0
+    ##  6 Afghanistan Asia       1977    38.4 14880372      786.  1800912
+    ##  7 Afghanistan Asia       1982    39.9 12881816      978.  -197644
+    ##  8 Afghanistan Asia       1987    40.8 13867957      852.   788497
+    ##  9 Afghanistan Asia       1992    41.7 16317921      649.  3238461
+    ## 10 Afghanistan Asia       1997    41.8 22227415      635.  9147955
+    ## # ... with 1,694 more rows
+
+``` r
+#creates a new variable, square brackets subsets according to what you would like
+#note, everything before 1972 is negative, 1972 is zero, after 1972 is positive
+```
 
 Make a new variable `pop_last_time`, as the “lag-1” population – that
 is, the population from the previous entry of that country. Use the
