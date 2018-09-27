@@ -178,9 +178,7 @@ gapminder %>%
   group_by(country) %>% 
   mutate(growth = pop - first(pop)) #creates a new variable
 
-gapminder %>% 
-  group_by(country) %>% 
-  mutate(change = pop - lag(pop)) #creates a new variable, lag function shifts the whole vector back once so you can predict)
+
 ```
 
 Notice that `dplyr` has retained the original grouping.
@@ -198,7 +196,9 @@ gapminder %>%
 Make a new variable `pop_last_time`, as the "lag-1" population -- that is, the population from the previous entry of that country. Use the `lag` function.
 
 ```{r}
-
+gapminder %>% 
+  group_by(country) %>% 
+  mutate(change = pop - lag(pop)) #creates a new variable, lag function shifts the whole vector back once so you can predict)
 ```
 
 Similar: `lead` function.
@@ -212,13 +212,37 @@ Your turn: Use what we learned to answer the following questions.
 1. Determine the country that experienced the sharpest 5-year drop in life expectancy, in each continent.
 
 ```{r}
-
+gapminder %>% 
+  group_by(continent, country) %>% 
+  mutate(drop = lag(lifeExp) - lifeExp) %>% 
+  filter(!is.na(drop)) %>% 
+  summarise(min = min(drop)) %>% 
+  arrange(min)
 ```
 
 2. Compute the relative gdp (NOT per capita!) of each country compared to Canada (= GDP of a country / GDP of Canada).
 
+
+
+
+
 ```{r}
 
+cda<-gapminder %>% 
+  mutate(gdp = gdpPercap * pop) %>% 
+  filter(country == "Canada") %>% 
+  `[[`("gdp")
+
+gapminder %>% 
+ mutate(cda_gdp = rep(cda, nlevels(country)))
+
+
+
+gapminder %>% 
+ mutate(cda_gdp = rep(cda, nlevels(country)),
+        gdp = gdpPercap* pop,
+        rel_gdp = gdp/cda_gdp)
+  
 ```
 
 Sanity check: are Canada's numbers = 1? What is the spread of numbers like (should be small)?
