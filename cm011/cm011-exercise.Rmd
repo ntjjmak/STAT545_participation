@@ -237,13 +237,18 @@ Lists can hold pretty much anything, and can also be named. Let's use the follow
 Subsetting a list works similarly to vectors. You can store almost anything in a list. Try subsetting the first element of `my_list`; try subsettig the first _component_ of the list. Notice the difference!
 
 ```{r}
-
+my_list[2]
+my_list[[2]]
 ```
+
+Note, inside this list, there is a vector of greater than one within it.
 
 Try also subsetting by name:
 
 ```{r}
-
+my_list["year"]
+my_list [["year"]]
+my_list$year
 ```
 
 Smells a little like `data.frame`s. It turns out a `data.frame` is a special type of list:
@@ -256,11 +261,12 @@ Smells a little like `data.frame`s. It turns out a `data.frame` is a special typ
 is.list(small_df)
 ```
 
+Coerce this into a list.
 ```{r}
 as.list(small_df)
 ```
 
-Note that there's a difference between a list of one object, and that object itself! This is different from vectors.
+Note that there's a difference between a list of one object, and that object itself! This is different from vectors. This demonstrates that vectors don't have extra baggage around them, but lists do. Vectors are straightforward.
 
 ```{r}
 identical(list(4), 4)
