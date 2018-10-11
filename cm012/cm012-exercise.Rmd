@@ -1,11 +1,9 @@
 ---
 title: "cm012 Exercises: Factors"
-output: html_notebook
-editor_options:
-  chunk_output_type: inline
+output: github_document
 ---
 
-`forcats` package comes loaded with `tiyverse`:
+`forcats` package comes loaded with `tidyverse`:
 
 ```{r}
 suppressPackageStartupMessages(library(tidyverse))
@@ -51,8 +49,20 @@ iris %>%
   mutate(Species = ifelse(Species == "versicolor", "vers", Species))
 ```
 
+Let's see what happened the species...
+
+```{r}
+iris %>% 
+  mutate(Species = ifelse(Species == "versicolor", "vers", Species)) %>% 
+  str()
+```
+
+
+It is because your variable is a factor and not a character. What you can do is convert the factor to a character (See next chunk). The reason why characters are treated as factors by R is because some packages operate using integers (e.g. ggplot--> automatically coerces characters into factors)
+
 ```{r}
 c(iris$Species, "setosa")
+as.character(iris$Species)
 ```
 
 
@@ -69,11 +79,19 @@ set.seed(10)
 (draw <- sample(letters[1:3], size = 10, replace = TRUE))
 ```
 
+THis is a character vector. 
+
 Convert `draw` to a factor. What are the levels? How many are there? How many of each category was drawn?
 
 ```{r}
-
+draw <- factor(draw)
+draw
+levels(draw)
+nlevels(draw)
+fct_count(draw)
 ```
+
+`fct_count` gives a tibble.
 
 
 ## Concatenating Factors
@@ -82,6 +100,8 @@ We saw that `c()` doesn't work for concatenating. Modify the following code to u
 
 ```{r}
 c(lotr1$Film, lotr2$Film)
+
+fct_c(lotr1$Film, lotr2$Film)
 ```
 
 Try binding by row `lotr1` and `lotr2`:
@@ -92,8 +112,9 @@ Try binding by row `lotr1` and `lotr2`:
 Which one is more lenient? Which would you prefer?
 
 ```{r}
-
-```
+rbind(lotr1, lotr2) %>%  str()
+bind_rows(lotr1, lotr2)
+``` 
 
 
 ## Unused Levels
@@ -120,7 +141,11 @@ gap_small <- gapminder %>%
 Exercise: Make a bar chart of the number of times a continent has a country with population < 250,000 in the `gapminder` data set. Try with and without `scale_x_discrete(drop=FALSE)`.
 
 ```{r}
-
+gap_small <- gapminder %>% 
+  filter(pop < 250000) %>% 
+  group_by(continent) %>% 
+  ggplot(aes(continent))+
+  geom_bar()
 ```
 
 __Example of when it's bad__: If you ever use the `levels()` function.
@@ -143,14 +168,14 @@ Exercise: get rid of the unused factor levels for country and continent in diffe
 
 ## Ordering
 
-Ordering of levels is alphabetical, by default. Usually not useful!
+Ordering of levels is alphabetical, by default. Usually not useful to have it in alphabetical order!
 
 ```{r}
 cont <- gapminder$continent
 levels(cont)
 ```
 
-Plotting happens in the order of the factor levels:
+Plotting happens in the order of the factor levels. This is using `qplot` which makes an automatic bar chart
 
 ```{r, fig.width=2, fig.height=1}
 qplot(cont)
@@ -165,10 +190,12 @@ Reorder by frequency:
 - Rearrange by frequency: `fct_infreq()`.
 - Reverse: `fct_rev()` 
 
-```{r, fig.width=2, fig.height=1}
+```{r, fig.width=6, fig.height=1}
 cont %>% 
-  fct_infreq() %>% 
+  fct_infreq() %>%
   qplot()
+
+
 ```
 
 Could also arrange by the order they appear in the factor with `fct_inorder()`.
@@ -185,16 +212,24 @@ ggplot(gap_asia_2007, aes(lifeExp, country)) + geom_point()
 
 Let's use `fct_reorder()` to reorder the countries of `gap_asia_2007` by life Expectancy, and produce the same plot:
 
-```{r, fig.width=2, fig.height=1}
-
+```{r, fig.width=2, fig.height=5}
+gap_asia_2007 %>% 
+  mutate(country=fct_reorder(country, lifeExp)) %>% 
+ggplot(aes(lifeExp, country))+
+  geom_point()
 ```
 
 What about when life Expectancy is not unique? Example: life expectancy of each continent:
 
-```{r, fig.width=2, fig.height=1}
-ggplot(gapminder, aes(continent, lifeExp)) +
+```{r, fig.width=4, fig.height=2}
+gapminder %>% 
+  mutate(continent = fct_reorder(continent, lifeExp)) %>% 
+  ggplot(aes(continent, lifeExp)) +
   geom_violin()
-ggplot(gapminder, aes(continent, lifeExp)) +
+
+gapminder %>% 
+  mutate(continent = fct_reorder(continent, lifeExp)) %>% 
+  ggplot(aes(continent, lifeExp)) +
   geom_boxplot()
 ```
 
@@ -203,7 +238,10 @@ ggplot(gapminder, aes(continent, lifeExp)) +
 Exercise: Try making the above box plot and violin plots, ordered by median lifeExp. Try other functions to order by by modifying the `.fun` argument.
 
 ```{r, fig.width=2, fig.height=1}
-
+ggplot(gapminder, aes(continent, lifeExp)) +
+  geom_violin()
+ggplot(gapminder, aes(continent, lifeExp)) +
+  geom_boxplot()
 ```
 
 
@@ -226,7 +264,10 @@ Use `fct_reorder2(f, x, y)` to reorder factor `f`:
 Exercise: Reorder the above line graph so that the legend is in order of last life expectancy. Useful for black-and-white printing!
 
 ```{r, fig.width=2, fig.height=1}
-
+gap_select <- gapminder %>% 
+  mutate(country = fct_reorder2(country, year, lifeExp)) %>% 
+  ggplot(aes(year, lifeExp)) +
+  geom_line(aes( colour=country))
 ```
 
 ### Ordering "because I said so"
@@ -241,6 +282,11 @@ Here's how to use `fct_relevel()` to do that. Exercise: modify the code so that:
 ```{r}
 gap_asia_2007$country %>% 
   fct_relevel("Syria") %>% 
+  levels() %>% 
+  head()
+
+gap_asia_2007$country %>% 
+  fct_relevel("Syria", "Sweden", after =2) %>%  # after the second level, put SyriA
   levels() %>% 
   head()
 ```
@@ -271,7 +317,7 @@ gap_2007 <- gapminder %>%
 
 We can arbitrarily combine levels using `fct_collapse()`. For example, combine Europe and Asia into one factor called "combo":
 
-```{r, fig.width=2, fig.height=1}
+```{r, fig.width=4, fig.height=1}
 cont %>% 
   fct_collapse("combo" = c("Europe", "Asia")) %>% 
   qplot()
@@ -284,8 +330,14 @@ More practically, we can lump the least frequent levels together as "Other". Mod
 - You let `fct_lump()` decide on the number of non-other continents. How is this chosen?
 - Note: you can manually specify non-other levels using `fct_other()`.
 
-```{r, fig.width=2, fig.height=1}
+```{r, fig.width=4, fig.height=1}
+cont %>% 
+  fct_lump() %>% 
+  qplot()
 
+cont %>% 
+  fct_lump(n = 2) %>% 
+  qplot()
 ```
 
 We can use the `w` argument to lump by another variable.
@@ -343,7 +395,8 @@ Goal here: some exposure to `lubridate`; know it exists.
 1. Use different combinations of y, m, d to make a date time object.
 
 ```{r}
-
+lubridate::ymd(170511)
+lubridate::ymd("2017-May-11")
 ```
 
 2. Get `year`, `month`, `yday`, `wday`, `day`.
